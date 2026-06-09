@@ -40,7 +40,7 @@ To remove redundant information, a custom script was used along with [SeqKit](ht
 The biggest caveat in using publicly available sequences from big repositories is their variable quality. Therefore, two steps were taken to identify whether a certain sequence can be reliably used as a reference.
 
 #### Selfblast
-In this step the whole database was blasted against itself. Assuming that there are enough different sequences for any given species, the BLAST results should largely consist of the same species (or at least species from the same genus if the barcode gap is too small). We set thresholds to classify the sequences into distinct categories:
+In this step the whole database was blasted against itself. Assuming that there are enough different sequences for any given species, the BLAST results should largely consist of the same species (or at least species from the same genus if the barcode gap is too small). We set thresholds to classify the sequences into distinct categories and analysed the results with a custom script:
 
 ```
 BLAST results >= 75% same species as query → accepted
@@ -49,8 +49,10 @@ BLAST results between 25% and 75% same species as query → check manually
 Species with <= 3 sequences → accept as low_count
 
 ```
+Sequences in the 25% to 75% bracket were checked manually if the difference to the other BLAST hits from the same query was from phlyum to family level. Sequences where the difference was in the genus or species level were provisionally accepted, but will receive a different score (see Scoring part). This whole step was repeated until there were no more sequences automatically rejected (In this case a total of two times). 
 
 #### Species delimitation
+As an independent approach to analyse how well the sequences can be distinguished from one another, we split the sequences into their respective families and used single-locus species 
 
 ### Scoring
 
