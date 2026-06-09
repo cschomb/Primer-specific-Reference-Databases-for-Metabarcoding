@@ -43,7 +43,10 @@ The biggest caveat in using publicly available sequences from big repositories i
 In this step the whole database was blasted against itself. Assuming that there are enough different sequences for any given species, the BLAST results should largely consist of the same species (or at least species from the same genus if the barcode gap is too small). We set thresholds to classify the sequences into distinct categories:
 
 ```
-BLAST results >= 75% same species as query →
+BLAST results >= 75% same species as query → accepted
+BLAST results <= 25% same species as query → rejected
+BLAST results between 25% and 75% same species as query → check manually
+Species with <= 3 sequences → accept as low_count
 
 ```
 
