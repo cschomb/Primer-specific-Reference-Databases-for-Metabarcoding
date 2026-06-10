@@ -52,9 +52,38 @@ Species with <= 3 sequences → accept as low_count
 Sequences in the 25% to 75% bracket were checked manually if the difference to the other BLAST hits from the same query was from phlyum to family level. Sequences where the difference was in the genus or species level were provisionally accepted, but will receive a different score (see Scoring part). This whole step was repeated until there were no more sequences automatically rejected (In this case a total of two times). 
 
 #### Species delimitation
-As an independent approach to analyse how well the sequences can be distinguished from one another, we split the sequences into their respective families and used single-locus species 
+As an independent approach to analyse how well the sequences can be distinguished from one another, we split the sequences into their respective families and used single-locus species delimitation [mPTP](https://github.com/Pas-Kapli/mptp) to see how well species can be separated from one another. The results were then analysed with a custom script into different categories (see scoring). 
 
 ### Scoring
+Scoring of the reference sequences was done by allocating points depending on the categories from the selfblast and Species delimitation step.
+```
+Selfblast:
+accepted:               4 pts
+hits in the same genus: 2 pts
+hits in other genera:   0 pts
+low_count / singleton:  2 pts
+```
+```
+Species delimitation:
+single species clade:   2 pts
+species from the same genus: 1 pt
+low_count / singletons: 1 pt
+multiple genera:        0 pts
+```
+Both counts we added together and the reference sequences were given a quality indicator:
+```
+Quality:
+platinum: 6 pts
+gold:   5-4 pts
+silver: 3-2 pts
+bronze:   1 pt
+bad:      0 pts
+```
+Sequences with a bad quality indicator (no points from either the selfblast or the mPTP analysis)
+
+
+
+
 
 ### Final clean-up
 
