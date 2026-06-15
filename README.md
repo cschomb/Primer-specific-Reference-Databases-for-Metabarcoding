@@ -1,5 +1,7 @@
 # Primer specific Reference Databases for Metabarcoding
 ## Introduction
+This repository contains primer specific reference databases and score sheets for the analysis of Metabarcoding data. They are best used together with [Metabarcoding-Analysis-with-a-Custom-Reference](https://github.com/cschomb/Metabarcoding-Analysis-with-a-Custom-Reference) (see its README for details).
+The zipped files for each primer pair contain the Reference fasta file, the scoring file, an overview of the taxonomies in the reference, as well as metadata for the reference sequences, and information about the different steps during database generation. Here is a detailed overview for the generation of the reference database for the ITS-3p62plF1 and ITS-4unR1 primers for Metabarcoding in plants:
 
 ## Database generation
 ### Sequence download from NCBI
