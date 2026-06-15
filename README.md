@@ -79,13 +79,12 @@ silver: 3-2 pts
 bronze:   1 pt
 bad:      0 pts
 ```
-Sequences with a bad quality indicator (no points from either the selfblast or the mPTP analysis)
 
-
-
+Species in the reference file were checked against GBIF for at least 10 occurrences since 1980 in Germany. Five additional points were added to the sequences of species with occurrences. The "Score" column can be used as an unbiased score, that includes the whole reference database, while the "Score_ger" column is for use as a local reference.
 
 
 ### Final clean-up
-
+Sequences with a bad quality indicator (no points from either the selfblast or the mPTP analysis) were removed from the reference file.
 
 ## How to use
+This reference database and corresponding are made for use with the [Metabarcoding-Analysis-with-a-Custom-Reference](https://github.com/cschomb/Metabarcoding-Analysis-with-a-Custom-Reference) repository. The reference fasta and scoring file can be put into the "input" folder of a project and set in the "settings.xlsx"
