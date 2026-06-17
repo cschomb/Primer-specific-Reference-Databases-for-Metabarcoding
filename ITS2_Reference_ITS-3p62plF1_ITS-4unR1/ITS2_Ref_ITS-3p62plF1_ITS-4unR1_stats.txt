@@ -42,7 +42,7 @@ Metazoa          70,245
 Others            9,021
 
 ### FINAL CLEANUP ###
-Viridiplantae   317,784
-Fungi           167,950
-Metazoa          67,495
-Others            7,279
+Viridiplantae   315,390
+Fungi           167,384
+Metazoa          64,258
+Others            9,001
