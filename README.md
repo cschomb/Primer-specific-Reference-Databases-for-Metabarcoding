@@ -53,34 +53,17 @@ Species with <= 3 sequences → accept as low_count
 ```
 Sequences in the 25% to 75% bracket were checked manually if the difference to the other BLAST hits from the same query was from phlyum to family level. Sequences where the difference was in the genus or species level were provisionally accepted, but will receive a different score (see Scoring part). This whole step was repeated until there were no more sequences automatically rejected (In this case a total of two times). 
 
-#### Species delimitation
-As an independent approach to analyse how well the sequences can be distinguished from one another, we split the sequences into their respective families and used single-locus species delimitation [mPTP](https://github.com/Pas-Kapli/mptp) to see how well species can be separated from one another. The results were then analysed with a custom script into different categories (see scoring). 
-
 ### Scoring
-Scoring of the reference sequences was done by allocating points depending on the categories from the selfblast and Species delimitation step.
+Scoring of the reference sequences was done by allocating points depending on the categories from the selfblast step.
 ```
 Selfblast:
-accepted:               4 pts
-hits in the same genus: 2 pts
-hits in other genera:   0 pts
-low_count / singleton:  2 pts
+accepted:               4 pts --> gold
+hits in the same genus: 2 pts --> silver
+low_count / singleton:  2 pts --> silver
+hits in other genera:   0 pts --> bronze
+
 ```
-```
-Species delimitation:
-single species clade:   2 pts
-species from the same genus: 1 pt
-low_count / singletons: 1 pt
-multiple genera:        0 pts
-```
-Both counts we added together and the reference sequences were given a quality indicator:
-```
-Quality:
-platinum: 6 pts
-gold:   5-4 pts
-silver: 3-2 pts
-bronze:   1 pt
-bad:      0 pts
-```
+
 
 Species in the reference file were checked against GBIF for at least 10 occurrences since 1980 in Germany. Five additional points were added to the sequences of species with occurrences. The "Score" column can be used as an unbiased score, that includes the whole reference database, while the "Score_ger" column is for use as a local reference.
 
