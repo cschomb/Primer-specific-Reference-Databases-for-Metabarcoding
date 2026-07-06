@@ -11,38 +11,9 @@ NOT whole genome
 NOT complete genome
 NOT partial genome
 
-### DOWNLOAD ###
-Viridiplantae   606,085
-Fungi         2,052,431
-Metazoa         542,615
-Others          258,879
-
-### GBIF TAXONOMY (species level) ###
-Viridiplantae   544,153
-Fungi           870,414
-Metazoa         425,996
-Others           96,609
-
-### PRIMERS AND SIZE ###
-Viridiplantae   456,177
-Fungi           262,872
-Metazoa         155,745
-Others           17,716
-
-### REMOVE DUPLICATES ###
-Viridiplantae   326,018
-Fungi           172,930
-Metazoa          70,272
-Others            9,028
-
-### SELFBLAST ###
-Viridiplantae   325,569
-Fungi           172,762
-Metazoa          70,245
-Others            9,021
-
-### FINAL CLEANUP ###
-Viridiplantae   315,390
-Fungi           167,384
-Metazoa          64,258
-Others            9,001
+### SEQUENCES ###
+Download            3,353,017
+GBIF taxonomy
+Primers and size      897,858 
+duplicates removed    600,206
+selfblast             583,860
