@@ -1,7 +1,7 @@
 # Primer specific Reference Databases for Metabarcoding
 ## Introduction
-This repository contains primer specific reference databases and score sheets for the analysis of Metabarcoding data. They are best used together with [Metabarcoding-Analysis-with-a-Custom-Reference](https://github.com/cschomb/Metabarcoding-Analysis-with-a-Custom-Reference) (see its README for details).
-The zipped files for each primer pair contain the Reference fasta file, the scoring file, an overview of the taxonomies in the reference, as well as metadata for the reference sequences, and information about the different steps during database generation. Here is a detailed overview for the generation of the reference database for the ITS-3p62plF1 and ITS-4unR1 primers for Metabarcoding in plants:
+This repository contains Python and R-scripts for the generation of a custom reference database for the analysis of Metabarcoding datasets. The Method uses primarily the scripts provided, but several steps are most easily executed through a command line interface, such as WSL (if you're working on a windows machine). Primer specific reference databases and score sheets for the analysis of Metabarcoding data are best used together with [Metabarcoding-Analysis-with-a-Custom-Reference](https://github.com/cschomb/Metabarcoding-Analysis-with-a-Custom-Reference) (see its README for details).
+The folders for each primer pair contain the scoring file, an overview of the taxonomies in the reference, as well as the link to the Reference fasta file, and information about the different steps during database generation. Here is a detailed overview for the generation of the reference database for the ITS-3p62plF1 and ITS-4unR1 primers for Metabarcoding in plants:
 
 ## Database generation
 ### Sequence download from NCBI
@@ -20,21 +20,18 @@ NOT complete genome
 NOT partial genome
 ```
 
-### Taxonomy
-In order to generate a consistent taxonomy for the references, the downloaded sequences were assigned their NCBI taxonomy with the [taxonomizR](https://cran.r-project.org/web/packages/taxonomizr/index.html) R-package and subsequently matched against the GBIF taxonomic backbone with [rgbif](https://www.gbif.org/tool/81747/rgbif). Only sequences with species level information were kept and their corresponding NCBI and GBIF taxids were written into the fasta header along with theit Accession numbers and taxonomy in the SINTAX format.
+### Primer specificity
+Since the focus of these reference sequences was not to be limited by a only a certain subset of taxa, but to contain all available sequences, that can be amplified with a specific set of primers, the downloaded sequences were cut with [cutadapt](https://cutadapt.readthedocs.io/en/stable/) at the primer binding sites (in this case ITS-3p62plF1 and ITS-4unR1 from [Kolter & Gemeinholzer, 2020](https://cdnsciencepub.com/doi/10.1139/gen-2019-0198?url_ver=Z39.88-2003&rfr_id=ori:rid:crossref.org&rfr_dat=cr_pub%20%200pubmed)).
+Further sequences were then excluded if they did not fall into an acceptable length range (in this case 200-500bp).
 
-```[Accession number];tax=p:[PHYLUM],c:[CLASS],o:[ORDER],f:[FAMILY],g:[GENUS],s:[SPECIES],gbiftax:[GBIF TAXONOMY],ncbitax:[NCBI TAXONOMY]```
+### Taxonomy
+In order to generate a consistent taxonomy for the references, the downloaded sequences were assigned their NCBI taxonomy with the [taxonomizR](https://cran.r-project.org/web/packages/taxonomizr/index.html) R-package and subsequently matched against the Catalogue of Life (COL) taxonomic backbone with [rgbif](https://www.gbif.org/tool/81747/rgbif). Only sequences with species level information were kept and their corresponding NCBI, COL and GBIF taxids were written into the fasta header along with theit Accession numbers and taxonomy in the SINTAX format.
+
+```[Accession number];tax=p:[PHYLUM],c:[CLASS],o:[ORDER],f:[FAMILY],g:[GENUS],s:[SPECIES],ncbitax:[NCBI TAXONOMY],gbiftax:[GBIF TAXONOMY],coltax:[COL TAXONOMY]```
 
 Example:
 
-```OR234967.1;tax=p:Tracheophyta,c:Magnoliopsida,o:Boraginales,f:Boraginaceae,g:Borago,s:Borago_officinalis,gbiftax:2926110,ncbitax:13363```
-
-
-
-### Primer specificity
-Since the focus of these reference sequences was not to be limited by a only a certain subset of clades, but to contain all available sequences, that can be amplified with a specific set of primers, the remaining sequences were cut with [cutadapt](https://cutadapt.readthedocs.io/en/stable/) at the primer binding sites (in this case ITS-3p62plF1 and ITS-4unR1 from [Kolter & Gemeinholzer, 2020](https://cdnsciencepub.com/doi/10.1139/gen-2019-0198?url_ver=Z39.88-2003&rfr_id=ori:rid:crossref.org&rfr_dat=cr_pub%20%200pubmed))
-
-Further sequences were then excluded if they did not fall into an acceptable length range (in this case 200-500bp).
+```OR234967.1;tax=p:Tracheophyta,c:Magnoliopsida,o:Boraginales,f:Boraginaceae,g:Borago,s:Borago_officinalis,ncbitax:13363,gbiftax:2926110,coltax:MJ92```
 
 To remove redundant information, a custom script was used along with [SeqKit](https://bioinf.shenwei.me/seqkit/) to identify records that showed the exact same taxonomy and identical nucleotide sequence.
 
@@ -64,8 +61,44 @@ hits in other genera:   0 pts --> bronze
 
 ```
 
-
-Species in the reference file were checked against GBIF for at least 10 occurrences since 1980 in Germany. Five additional points were added to the sequences of species with occurrences. The "Score" column can be used as an unbiased score, that includes the whole reference database, while the "Score_ger" column is for use as a local reference.
+Species in the reference file were checked against GBIF for at least 10 occurrences since 1980 in Germany. Five additional points were added to the sequences of species with occurrences. The "Score" column can be used as an unbiased score, that includes the whole reference database, while the "Score_ger" column is for use as a local reference (= Score + local score).
 
 ## How to use
+### Database generation
+The R-script in the scripts folder is designed to guide you through the process.
+
+Dependencies:
+- R (including the libraries: Biostrings, taxonomizr, tidyr, dplyr, rgbif, tibble, purr, data.table)
+- CLI (including Python 3.x (see individual scripts for further Python packages), cutadapt, Seqkit, ncbi-blast+)
+
+### Workflow and scripts
+- Starting with a FASTA file containing sequences from NCBI, the first step is to cut the sequences with the Primers used in the Metabarcoding study with cutadapt, and filter the resulting sequences for the desired length with SeqKit.
+
+- In order to assign taxonomic information to the sequences, you need the Accessions to Taxid table provided by NCBI ("nucl_gb_accession2taxid"). (can be downloaded from the NCBI ftp server [here](https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/). With this file you can search the accession numbers in your database for their taxid ("grep" the list of accession numbers created in the R script).
+
+- With the list of taxids you can use taxonomizr to get the full taxonomic lineage of each sequence, from which you can chose the ranks of interest (i.e. Phylum, Class, Order, Family, Genus, Species).
+
+- For a consistent taxonomic backbone you can match the resulting taxonomy table against the Catalogue of Life (or GBIF) backbone.
+
+- From the results of this match you can contruct new FASTA headers for your sequences containing their Accession number, taxonomic information, and Taxon IDs from different backbones.
+
+- The next steps will remove redundant information and ensure a high quality of reference sequences. First, duplicate sequences (same sequences with same taxonomic information) are removed with SeqKit and a custom Python script.
+  ```
+  seqkit rmdup sequences.fasta -s -i -D dupliucates.txt
+  ```
+  With the resulting file, you can run the 02_remove_duplicates.py script
+  ```
+  python3 remove_duplicates.py [--out-prefix TARGET_FOLDER] duplicates.txt
+  ```
+  This will results in two text files containing the set of accession numbers from the database, which are accepted (to keep) and one to remove (delete from database), which can also be done with Seqkit grep function.
+
+- With a clean and non-redundant database, you can now identify sequences, which are likely to be wrongly annotated. To that end, you can blast the database against itself and analyse the results for consistency with the selfblast_analysis.py script
+  ```
+  makeblastdb -in sequence.fasta -dbtype nucl -out DB_NAME
+  blastn -query sequences.fasta -db DB_NAME -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qcovs" -max_target_seqs 50 -num_threads 6 -out selfblast1.out
+  ```
+  The blast output format is a custom one, because we want to include the information about the query coverage.
+
+- The BLAST output can then further be analysed and put into the categories described above, by feeding it into the 
+
 This reference database and corresponding are made for use with the [Metabarcoding-Analysis-with-a-Custom-Reference](https://github.com/cschomb/Metabarcoding-Analysis-with-a-Custom-Reference) repository. The reference fasta and scoring file can be put into the "input" folder of a project and set in the "settings.xlsx"
