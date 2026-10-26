@@ -108,14 +108,39 @@ Dependencies:
     | q_acc | q_phylum | q_class | q_order | q_family | q_genus | q_species | s_acc | s_phylum | s_class | s_order | s_family | s_genus | s_species | pident | length | mismatches | gapopens | qstart | qend | sstart | send | evalue | bitscore | qcov | score | score_interval |
     |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
     | Accession number of the query | Phylum of the query | Class of the query | Order of the query | Family of the query | Genus of the query | Species of the query | Accession of the subject | Phylum of the subject | Class of the subject | Order of the subject | Family of the subject | Genus of the subject | Species of the subject | Percent identity of the alignment | Length of the alignment | Mismatches in the alignment | Opened gaps in the alignment | Alignment start in the query | Alignment end in the query | Alignment start in the subject | Alignment end in the subject | E-Value of the Alignment |Bitscore of the ALignment | Query coverage | Score of the alignment (= pident + (qcov /5)) | Interval of the Score |
-    
 
+    - species_count.txt (a text file containing the amount of sequences per species; used to check for low coverage and sigleton species)
+   
+    - summarised_blast_results.csv (summary of the filtered BLAST results, one query sequence per line)
+      | q_acc | q_phylum | q_class | q_order | q_family | q_genus | q_species | diff_counts | highest_diff_level | group_size | score interval | difference_values |
+      |-|-|-|-|-|-|-|-|-|-|-|-|
+      | Accession number of the query | Phylum of the query | Class of the query | Order of the query | Family of the query | Genus of the query | Species of the query | Overview on how many sequences with different levels of taxonomy were found in the filteres BLAST hits | Highest level of taxonomic defferences in the BLAST hits | Amount of sequences retained from the BLAST hits after filtering | Interval of the score from the BLAST | Detailed view of different taxonomies within the filtered BLAST hits, incl. amounts |
 
+      - Five .csv files with categorised BLAST results:
+        - accepted - >= 75% of BLAST hits have the same taxonomy as the query sequence
+        - low_coverage - <= 3 sequences with the same taxonomy as the query sequence are in the database
+        - singleton - sequences with unique taxonomies
+        - check - the BLAST hits have between 25% and 75% the same taxonomy as the query sequence
+        - refused - <= 25% of the BLAST hits have the same taxonomy as the query sequence
+       
+        | q_acc | q_phylum | q_class | q_order | q_family | q_genus | q_species | diff_counts | highest_diff_level | group_size | score interval | difference_values | species_count | category | 
+        |-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+        | Accession number of the query | Phylum of the query | Class of the query | Order of the query | Family of the query | Genus of the query | Species of the query | Overview on how many sequences with different levels of taxonomy were found in the filteres BLAST hits | Highest level of taxonomic defferences in the BLAST hits | Amount of sequences retained from the BLAST hits after filtering | Interval of the score from the BLAST | Detailed view of different taxonomies within the filtered BLAST hits, incl. amounts | Amount of sequences with the same taxonomy in the database | Category of the sequence (accepted, low_coverage, singleton, check, refused)
 
+        - Query sequences which were refused can be removed from the reference database (similar as described above with the inverted grep function of SeqKit). Similarly, the user can decide whether to incorporate the low abundance and singleton sequences into the reference database (since the selfblast quality control mechanism does not apply here). For the entries categorised under 'check', you can manually inspect the sequences and decide to keep or remove them. Sequences where the taxonomic differences in the BLAST are on the species or genus level can be expected to be very similar, since they are closely related (they should be incorporated into the reference database). The BLAST hits with higher taxonomic differences (Phylum - Family) usually contain a handful of wrongly annotated sequences, which can be identified by BLAST against the nr database on the BLAST homepage and then removed from you r sequences.
 
+- These database pruning steps of the database should be repeated until you are satisfied with results (usually two or three rounds of selfblast and analysis).
 
+- With the reference database finished, you can go back to the R-script and create a scroring file with the analysis from the selfblast steps (the categories translate to quality information of the reference sequence)
 
+  | Category | Score | Quality |
+  |-|-|-|
+  | accepted | 4 | gold |
+  | low_coverage | 2 | silver |
+  | singleton | 2 | silver |
+  | check | 0 | bronze |
+  | check with highest difference level at species | 2 | silver |
 
+- For the incorporation of a local occurence score into the reference database, the R-script has an example to query GBIF for occurences with parameters (in this case a country, a year after which occurrences are considered and a threshold for occurrences). The sequences of species considered to have local occurrences according to these parameters are assigned additional score points in a new column (combined with the normal score) so they will have a higher overall score than non-local species.
 
-
-This reference database and corresponding are made for use with the [Metabarcoding-Analysis-with-a-Custom-Reference](https://github.com/cschomb/Metabarcoding-Analysis-with-a-Custom-Reference) repository. The reference fasta and scoring file can be put into the "input" folder of a project and set in the "settings.xlsx"
+- The reference database and scoring file generated with the steps above are made to be used with the [Metabarcoding-Analysis-with-a-Custom-Reference](https://github.com/cschomb/Metabarcoding-Analysis-with-a-Custom-Reference) repository. This script can takes the quality information from the scoring file into account, so that the resulting taxonomic assignment contains high quality sequences. With the additional information of local occurrences, the reference database will prefer these local species, while not sacrificing information from sequences, which may introduced or at least unexpected in the region of interest.
