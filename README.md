@@ -95,10 +95,27 @@ Dependencies:
 - With a clean and non-redundant database, you can now identify sequences, which are likely to be wrongly annotated. To that end, you can blast the database against itself and analyse the results for consistency with the selfblast_analysis.py script
   ```
   makeblastdb -in sequence.fasta -dbtype nucl -out DB_NAME
-  blastn -query sequences.fasta -db DB_NAME -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qcovs" -max_target_seqs 50 -num_threads 6 -out selfblast1.out
+  blastn -query sequences.fasta -db DB_NAME -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qcovs" -max_target_seqs 50 -num_threads 6 -out selfblast.out
   ```
   The blast output format is a custom one, because we want to include the information about the query coverage.
 
-- The BLAST output can then further be analysed and put into the categories described above, by feeding it into the 
+- The BLAST output can then further be analysed and put into the categories described above, by feeding it into the selfblast_analysis.py script.
+  ```
+  python3 selfblast_analysis.py [-o OUTPUT_DIR] [-t LENGTH_THRESHOLD] selfblast.out [--resume]
+  ```
+  The script will produce a number of output files:
+  - filtered_blast_results.csv (BLAST hits, which fall within 3% of identity of the best BLAST hit)
+    | q_acc | q_phylum | q_class | q_order | q_family | q_genus | q_species | s_acc | s_phylum | s_class | s_order | s_family | s_genus | s_species | pident | length | mismatches | gapopens | qstart | qend | sstart | send | evalue | bitscore | qcov | score | score_interval |
+    |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+    | Accession number of the query | Phylum of the query | Class of the query | Order of the query | Family of the query | Genus of the query | Species of the query | Accession of the subject | Phylum of the subject | Class of the subject | Order of the subject | Family of the subject | Genus of the subject | Species of the subject | Percent identity of the alignment | Length of the alignment | Mismatches in the alignment | Opened gaps in the alignment | Alignment start in the query | Alignment end in the query | Alignment start in the subject | Alignment end in the subject | E-Value of the Alignment |Bitscore of the ALignment | Query coverage | Score of the alignment (= pident + (qcov /5)) | Interval of the Score |
+    
+
+
+
+
+
+
+
+
 
 This reference database and corresponding are made for use with the [Metabarcoding-Analysis-with-a-Custom-Reference](https://github.com/cschomb/Metabarcoding-Analysis-with-a-Custom-Reference) repository. The reference fasta and scoring file can be put into the "input" folder of a project and set in the "settings.xlsx"
