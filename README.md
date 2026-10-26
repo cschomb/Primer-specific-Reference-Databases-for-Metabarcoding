@@ -39,29 +39,10 @@ To remove redundant information, a custom script was used along with [SeqKit](ht
 The biggest caveat in using publicly available sequences from big repositories is their variable quality. Therefore, two steps were taken to identify whether a certain sequence can be reliably used as a reference.
 
 #### Selfblast
-In this step the whole database was blasted against itself. Assuming that there are enough different sequences for any given species, the BLAST results should largely consist of the same species (or at least species from the same genus if the barcode gap is too small). We set thresholds to classify the sequences into distinct categories and analysed the results with a custom script:
-
-```
-BLAST results >= 75% same species as query → accepted
-BLAST results <= 25% same species as query → rejected
-BLAST results between 25% and 75% same species as query → check manually
-Species with <= 3 sequences → accept as low_count
-
-```
-Sequences in the 25% to 75% bracket were checked manually if the difference to the other BLAST hits from the same query was from phlyum to family level. Sequences where the difference was in the genus or species level were provisionally accepted, but will receive a different score (see Scoring part). This whole step was repeated until there were no more sequences automatically rejected (In this case a total of two times). 
+In this step the whole database was blasted against itself. Assuming that there are enough different sequences for any given species, the BLAST results should largely consist of the same species (or at least species from the same genus if the barcode gap is too small). We set thresholds to classify the sequences into distinct categories, depending on the frequency of BLAST results with identical taxonomies. Sequences with >75% identical taxonomies, were accepted, while sequences with <25% identical taxonomies were rejected. Sequences in the 25% to 75% bracket were checked manually if the difference to the other BLAST hits from the same query was from phlyum to family level. Sequences where the difference was in the genus or species level were provisionally accepted, but will receive a different score (see Scoring part). This whole step was repeated until there were no more sequences automatically rejected (In this case a total of two times). 
 
 ### Scoring
-Scoring of the reference sequences was done by allocating points depending on the categories from the selfblast step.
-```
-Selfblast:
-accepted:               4 pts --> gold
-hits in the same genus: 2 pts --> silver
-low_count / singleton:  2 pts --> silver
-hits in other genera:   0 pts --> bronze
-
-```
-
-Species in the reference file were checked against GBIF for at least 10 occurrences since 1980 in Germany. Five additional points were added to the sequences of species with occurrences. The "Score" column can be used as an unbiased score, that includes the whole reference database, while the "Score_ger" column is for use as a local reference (= Score + local score).
+Scoring of the reference sequences was done by allocating points depending on the categories from the selfblast step. Species in the reference file were checked against GBIF for at least 50 occurrences since 1980 in Germany. Five additional points were added to the sequences of species with occurrences. The "Score" column can be used as an unbiased score, that includes the whole reference database, while the "Score_ger" column is for use as a local reference (= Score + local score).
 
 ## How to use
 ### Database generation
@@ -109,10 +90,11 @@ Dependencies:
     | q_acc | q_phylum | q_class | q_order | q_family | q_genus | q_species | s_acc | s_phylum | s_class | s_order | s_family | s_genus | s_species | pident | length | mismatches | gapopens | qstart | qend | sstart | send | evalue | bitscore | qcov | score | score_interval |
     |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
     | Accession number of the query | Phylum of the query | Class of the query | Order of the query | Family of the query | Genus of the query | Species of the query | Accession of the subject | Phylum of the subject | Class of the subject | Order of the subject | Family of the subject | Genus of the subject | Species of the subject | Percent identity of the alignment | Length of the alignment | Mismatches in the alignment | Opened gaps in the alignment | Alignment start in the query | Alignment end in the query | Alignment start in the subject | Alignment end in the subject | E-Value of the Alignment |Bitscore of the ALignment | Query coverage | Score of the alignment (= pident + (qcov /5)) | Interval of the Score |
-
+  
     - species_count.txt (a text file containing the amount of sequences per species; used to check for low coverage and sigleton species)
    
     - summarised_blast_results.csv (summary of the filtered BLAST results, one query sequence per line)
+      
       | q_acc | q_phylum | q_class | q_order | q_family | q_genus | q_species | diff_counts | highest_diff_level | group_size | score interval | difference_values |
       |-|-|-|-|-|-|-|-|-|-|-|-|
       | Accession number of the query | Phylum of the query | Class of the query | Order of the query | Family of the query | Genus of the query | Species of the query | Overview on how many sequences with different levels of taxonomy were found in the filteres BLAST hits | Highest level of taxonomic defferences in the BLAST hits | Amount of sequences retained from the BLAST hits after filtering | Interval of the score from the BLAST | Detailed view of different taxonomies within the filtered BLAST hits, incl. amounts |
@@ -128,7 +110,7 @@ Dependencies:
         |-|-|-|-|-|-|-|-|-|-|-|-|-|-|
         | Accession number of the query | Phylum of the query | Class of the query | Order of the query | Family of the query | Genus of the query | Species of the query | Overview on how many sequences with different levels of taxonomy were found in the filteres BLAST hits | Highest level of taxonomic defferences in the BLAST hits | Amount of sequences retained from the BLAST hits after filtering | Interval of the score from the BLAST | Detailed view of different taxonomies within the filtered BLAST hits, incl. amounts | Amount of sequences with the same taxonomy in the database | Category of the sequence (accepted, low_coverage, singleton, check, refused)
 
-      - Query sequences which were refused can be removed from the reference database (similar as described above with the inverted grep function of SeqKit). Similarly, the user can decide whether to incorporate the low abundance and singleton sequences into the reference database (since the selfblast quality control mechanism does not apply here). For the entries categorised under 'check', you can manually inspect the sequences and decide to keep or remove them. Sequences where the taxonomic differences in the BLAST are on the species or genus level can be expected to be very similar, since they are closely related (they should be incorporated into the reference database). The BLAST hits with higher taxonomic differences (Phylum - Family) usually contain a handful of wrongly annotated sequences, which can be identified by BLAST against the nr database on the BLAST homepage and then removed from you r sequences.
+    - Query sequences which were refused can be removed from the reference database (similar as described above with the inverted grep function of SeqKit). Similarly, the user can decide whether to incorporate the low abundance and singleton sequences into the reference database (since the selfblast quality control mechanism does not apply here). For the entries categorised under 'check', you can manually inspect the sequences and decide to keep or remove them. Sequences where the taxonomic differences in the BLAST are on the species or genus level can be expected to be very similar, since they are closely related (they should be incorporated into the reference database). The BLAST hits with higher taxonomic differences (Phylum - Family) usually contain a handful of wrongly annotated sequences, which can be identified by BLAST against the nr database on the BLAST homepage and then removed from you r sequences.
 
 - These database pruning steps of the database should be repeated until you are satisfied with results (usually two or three rounds of selfblast and analysis).
 
