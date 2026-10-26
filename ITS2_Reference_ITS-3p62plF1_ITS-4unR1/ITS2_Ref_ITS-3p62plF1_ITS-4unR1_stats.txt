@@ -11,7 +11,7 @@ NOT whole genome
 NOT complete genome
 NOT partial genome
 
-### SEQUENCES ###
+### SEQUENCES REMAINING IN THE DATABASE AFTER EACH STEP ###
 Download            3,353,517
 Primers and size    1,516,295
 duplicates removed    359,562
