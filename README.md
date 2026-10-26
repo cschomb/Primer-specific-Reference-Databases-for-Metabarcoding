@@ -65,7 +65,7 @@ Dependencies:
 
 - The next steps will remove redundant information and ensure a high quality of reference sequences. First, duplicate sequences (same sequences with same taxonomic information) are removed with SeqKit and a custom Python script.
   ```
-  seqkit rmdup sequences.fasta -s -i -D dupliucates.txt
+  seqkit rmdup sequences.fasta -s -i -D duplicates.txt
   ```
   With the resulting file, you can run the 02_remove_duplicates.py script
   ```
@@ -106,9 +106,9 @@ Dependencies:
         - check - the BLAST hits have between 25% and 75% the same taxonomy as the query sequence
         - refused - <= 25% of the BLAST hits have the same taxonomy as the query sequence
        
-        | q_acc | q_phylum | q_class | q_order | q_family | q_genus | q_species | diff_counts | highest_diff_level | group_size | score interval | difference_values | species_count | category | 
-        |-|-|-|-|-|-|-|-|-|-|-|-|-|-|
-        | Accession number of the query | Phylum of the query | Class of the query | Order of the query | Family of the query | Genus of the query | Species of the query | Overview on how many sequences with different levels of taxonomy were found in the filteres BLAST hits | Highest level of taxonomic defferences in the BLAST hits | Amount of sequences retained from the BLAST hits after filtering | Interval of the score from the BLAST | Detailed view of different taxonomies within the filtered BLAST hits, incl. amounts | Amount of sequences with the same taxonomy in the database | Category of the sequence (accepted, low_coverage, singleton, check, refused)
+          | q_acc | q_phylum | q_class | q_order | q_family | q_genus | q_species | diff_counts | highest_diff_level | group_size | score interval | difference_values | species_count | category | 
+          |-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+          | Accession number of the query | Phylum of the query | Class of the query | Order of the query | Family of the query | Genus of the query | Species of the query | Overview on how many sequences with different levels of taxonomy were found in the filteres BLAST hits | Highest level of taxonomic defferences in the BLAST hits | Amount of sequences retained from the BLAST hits after filtering | Interval of the score from the BLAST | Detailed view of different taxonomies within the filtered BLAST hits, incl. amounts | Amount of sequences with the same taxonomy in the database | Category of the sequence (accepted, low_coverage, singleton, check, refused)
 
     - Query sequences which were refused can be removed from the reference database (similar as described above with the inverted grep function of SeqKit). Similarly, the user can decide whether to incorporate the low abundance and singleton sequences into the reference database (since the selfblast quality control mechanism does not apply here). For the entries categorised under 'check', you can manually inspect the sequences and decide to keep or remove them. Sequences where the taxonomic differences in the BLAST are on the species or genus level can be expected to be very similar, since they are closely related (they should be incorporated into the reference database). The BLAST hits with higher taxonomic differences (Phylum - Family) usually contain a handful of wrongly annotated sequences, which can be identified by BLAST against the nr database on the BLAST homepage and then removed from you r sequences.
 
